@@ -1,0 +1,5 @@
+# keep these in alphabetical order: https://github.com/rust-lang/rustfmt/issues/3149
+group_imports = "StdExternalCrate"
+imports_granularity = "Module"
+tab_spaces = 4
+unstable_features = true

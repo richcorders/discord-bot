@@ -1,0 +1,6 @@
+.devenv/
+.direnv/
+/result
+/target/
+.env
+.pre-commit-config.yaml
