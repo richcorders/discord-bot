@@ -7,10 +7,9 @@ pub mod message;
 pub mod models;
 pub mod schema;
 
-pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
+pub fn get_connection_pool(
+) -> Result<Pool<ConnectionManager<PgConnection>>, Box<dyn std::error::Error + Send + Sync>> {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let manager = ConnectionManager::<PgConnection>::new(database_url);
-    Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool.")
+    Ok(Pool::builder().build(manager)?)
 }
