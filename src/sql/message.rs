@@ -1,6 +1,9 @@
+use std::fmt::Write;
+
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::dsl::count;
 use diesel::prelude::*;
+use diesel::result::Error;
 use poise::serenity_prelude::utils::*;
 
 use super::{models, schema};
@@ -31,8 +34,10 @@ pub fn get_message_stats(conn: &mut PgConnection, since_days: Option<u32>) -> St
         top_users
             .into_iter()
             .enumerate()
-            .map(|(i, (user_id, count))| format!("{}. <@{}> ({})\n", i + 1, user_id, count))
-            .collect::<String>()
+            .fold(String::new(), |mut acc, (i, (user_id, count))| {
+                let _ = writeln!(acc, "{}. <@{}> ({})", i + 1, user_id, count);
+                acc
+            })
     });
 
     let message = vec![
@@ -60,7 +65,7 @@ pub fn create_message(
     content: &str,
     time_stamp: NaiveDateTime,
     author_id: i64,
-) -> models::Message {
+) -> Result<models::Message, Error> {
     use schema::messages;
 
     let new_message = models::Message {
@@ -74,5 +79,4 @@ pub fn create_message(
         .values(&new_message)
         .returning(models::Message::as_returning())
         .get_result(conn)
-        .expect("Error saving new message")
 }

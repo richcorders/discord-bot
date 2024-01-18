@@ -62,9 +62,14 @@
       };
     };
 
-  # for the fenix overlay
   nixConfig = {
-    extra-substituters = ["https://nix-community.cachix.org/"];
-    extra-trusted-public-keys = ["nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="];
+    extra-substituters = [
+      "https://nekowinston.cachix.org"
+      "https://nix-community.cachix.org/"
+    ];
+    extra-trusted-public-keys = [
+      "nekowinston.cachix.org-1:lucpmaO+JwtoZj16HCO1p1fOv68s/RL1gumpVzRHRDs="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 }

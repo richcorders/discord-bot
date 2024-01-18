@@ -1,9 +1,8 @@
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
 use event_handler::event_handler;
-use poise::serenity_prelude::{self as serenity, ActivityData, CreateEmbed};
-use poise::CreateReply;
-use sql::message::get_message_stats;
+use poise::serenity_prelude::{self as serenity, ActivityData};
+mod commands;
 mod dn;
 mod event_handler;
 mod sql;
@@ -16,13 +15,21 @@ type Context<'a> = poise::Context<'a, Data, Error>;
 
 #[tokio::main]
 async fn main() {
+    let db_pool = sql::get_connection_pool().expect("Failed to connect to database");
+    sql::run_migrations(&mut db_pool.get().unwrap()).expect("Failed to run migrations");
+
     let token = std::env::var("DISCORD_TOKEN").expect("missing DISCORD_TOKEN");
     let intents =
         serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT;
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![dn_stats()],
+            commands: vec![
+                commands::degen_leaderboard(),
+                commands::dn_stats(),
+                commands::help(),
+                commands::register(),
+            ],
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
@@ -32,9 +39,7 @@ async fn main() {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 ctx.set_activity(Some(ActivityData::watching("dn")));
-                Ok(Data {
-                    db_pool: sql::get_connection_pool()?,
-                })
+                Ok(Data { db_pool })
             })
         })
         .build();
@@ -43,23 +48,4 @@ async fn main() {
         .framework(framework)
         .await;
     client.unwrap().start().await.unwrap();
-}
-
-/// Displays deez stats
-#[poise::command(slash_command, prefix_command)]
-async fn dn_stats(
-    ctx: Context<'_>,
-    #[description = "Get stats for the last n days"] since_days: Option<u32>,
-) -> Result<(), Error> {
-    let conn = &mut ctx.data().db_pool.clone().get().unwrap();
-
-    let description = get_message_stats(conn, since_days);
-
-    let reply = CreateReply::default().embed(
-        CreateEmbed::default()
-            .title("deez stats")
-            .description(description),
-    );
-    ctx.send(reply).await?;
-    Ok(())
 }

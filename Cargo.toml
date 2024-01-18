@@ -1,5 +1,5 @@
 [package]
-name = "capture-dn"
+name = "richbot"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.74.0"
@@ -8,9 +8,21 @@ rust-version = "1.74.0"
 anyhow = "1.0.79"
 chrono = "0.4.31"
 poise = "0.6.1"
-tokio = { version = "1.35.1", features = ["rt-multi-thread"] }
 
 [dependencies.diesel]
 version = "2.1.4"
 features = ["chrono", "postgres", "r2d2"]
 default-features = false
+
+[dependencies.diesel_migrations]
+version = "2.1.0"
+features = ["postgres"]
+
+[dependencies.tokio]
+version = "1.35.1"
+features = ["rt-multi-thread"]
+
+[profile.release]
+lto = true
+opt-level = 3
+strip = true
