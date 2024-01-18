@@ -1,3 +1,5 @@
+#![deny(clippy::nursery, clippy::pedantic, clippy::perf)]
+#![allow(clippy::wildcard_imports)] // for diesel dsl::*
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
 use event_handler::event_handler;

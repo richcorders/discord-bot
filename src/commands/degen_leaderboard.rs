@@ -9,6 +9,7 @@ use crate::{Context, Error};
 
 /// The Richcord degen leaderboard
 #[poise::command(slash_command, subcommands("register", "show"))]
+#[allow(clippy::unused_async)]
 pub async fn degen_leaderboard(_: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
@@ -70,6 +71,8 @@ async fn register(
     ctx: Context<'_>,
     #[rename = "weighted_score"] score_value: f64,
 ) -> Result<(), Error> {
+    use crate::sql::schema::degen_leaderboard::dsl::*;
+
     if !(0.0..=100.0).contains(&score_value) {
         ctx.send(
             CreateReply::default()
@@ -80,9 +83,7 @@ async fn register(
         return Ok(());
     }
 
-    use crate::sql::schema::degen_leaderboard::dsl::*;
     let conn = &mut ctx.data().db_pool.clone().get().unwrap();
-
     let user = ctx.author();
 
     let _ = diesel::insert_into(degen_leaderboard)
@@ -99,7 +100,7 @@ async fn register(
     ctx.send(
         CreateReply::default()
             .ephemeral(true)
-            .content(format!("You registered a score of {:.1}.", score_value)),
+            .content(format!("You registered a score of {score_value:.1}.")),
     )
     .await?;
 

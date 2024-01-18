@@ -42,7 +42,7 @@ pub fn get_message_stats(conn: &mut PgConnection, since_days: Option<u32>) -> St
 
     let message = vec![
         format!("`dn` were recoreded a total of {} times.\n", total),
-        recent.map_or("".to_string(), |recent| {
+        recent.map_or(String::new(), |recent| {
             format!(
                 "({} times since {})\n",
                 recent,
@@ -53,13 +53,13 @@ pub fn get_message_stats(conn: &mut PgConnection, since_days: Option<u32>) -> St
             )
         }),
         "\n**Leaderboard:**\n".to_string(),
-        leaderboard.unwrap_or("".to_string()),
+        leaderboard.unwrap_or(String::new()),
     ];
 
     message.join("")
 }
 
-pub fn create_message(
+pub fn create(
     conn: &mut PgConnection,
     id: i64,
     content: &str,
