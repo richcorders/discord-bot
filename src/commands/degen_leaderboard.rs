@@ -32,7 +32,7 @@ async fn show(ctx: Context<'_>) -> Result<(), Error> {
                 chunk.iter().fold(
                     format!("**Richcord degen leaderboard**: Page {}\n\n", chunk_i + 1),
                     |mut output, data| {
-                        let _ = writeln!(output, "{:.1} - <@{}>", data.score, data.id);
+                        let _ = writeln!(output, "{:.1} - <@{}>", data.score, data.user_id);
                         output
                     },
                 ) + "\n**lower score = more degen**\n[take it yourself](https://senguyen1011.github.io/state-purity/) & register your own score with \n`/degen_leaderboard register <weighted_score>`"
@@ -88,11 +88,11 @@ async fn register(
 
     let _ = diesel::insert_into(degen_leaderboard)
         .values((
-            id.eq::<i64>(user.id.into()),
+            user_id.eq::<i64>(user.id.into()),
             score.eq(score_value),
             time_stamp.eq(diesel::dsl::now),
         ))
-        .on_conflict(id)
+        .on_conflict(user_id)
         .do_update()
         .set(score.eq(score_value))
         .execute(conn);

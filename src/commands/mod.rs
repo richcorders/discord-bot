@@ -21,7 +21,7 @@ pub async fn help(
 ) -> Result<(), Error> {
     let config = poise::builtins::HelpConfiguration {
         extra_text_at_bottom: "\
-Use /help command for more info on a command.",
+Use /help <command> for more info on a specific command.",
         ephemeral: true,
         ..Default::default()
     };

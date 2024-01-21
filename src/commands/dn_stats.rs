@@ -8,7 +8,9 @@ use crate::{Context, Error};
 #[poise::command(slash_command)]
 pub async fn dn_stats(
     ctx: Context<'_>,
-    #[description = "Get stats for the last n days"] since_days: Option<u32>,
+    #[description = "Get stats for the last n days"]
+    #[rename = "since"]
+    since_days: Option<u32>,
 ) -> Result<(), Error> {
     let conn = &mut ctx.data().db_pool.clone().get().unwrap();
 

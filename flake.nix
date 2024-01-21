@@ -58,7 +58,9 @@
             listen_addresses = "127.0.0.1";
           };
         };
-        packages.default = pkgs.callPackage ./nix {};
+        packages = {
+          default = pkgs.callPackage ./nix {};
+        };
       };
     };
 

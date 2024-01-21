@@ -1,17 +1,16 @@
-use std::env;
-
 use diesel::pg::{Pg, PgConnection};
-use diesel::r2d2::{ConnectionManager, Pool};
+use diesel::r2d2::{ConnectionManager, Pool, PoolError};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 pub mod message;
 pub mod models;
+pub mod options;
 pub mod schema;
+pub mod starboard_message;
 
 pub fn get_connection_pool(
-) -> Result<Pool<ConnectionManager<PgConnection>>, Box<dyn std::error::Error + Send + Sync>> {
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
-    Ok(Pool::builder().build(manager)?)
+    database_url: String,
+) -> Result<Pool<ConnectionManager<PgConnection>>, PoolError> {
+    Pool::builder().build(ConnectionManager::<PgConnection>::new(database_url))
 }
 
 pub fn run_migrations(

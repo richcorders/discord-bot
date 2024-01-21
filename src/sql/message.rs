@@ -8,6 +8,8 @@ use poise::serenity_prelude::utils::*;
 
 use super::{models, schema};
 
+/// creates human-readable message stats
+#[allow(clippy::cast_precision_loss)]
 pub fn get_message_stats(conn: &mut PgConnection, since_days: Option<u32>) -> String {
     use schema::messages::dsl::*;
 
@@ -35,13 +37,20 @@ pub fn get_message_stats(conn: &mut PgConnection, since_days: Option<u32>) -> St
             .into_iter()
             .enumerate()
             .fold(String::new(), |mut acc, (i, (user_id, count))| {
-                let _ = writeln!(acc, "{}. <@{}> ({})", i + 1, user_id, count);
+                let _ = writeln!(
+                    acc,
+                    "{}. <@{}> - {} ({}%)",
+                    i + 1,
+                    user_id,
+                    count,
+                    (count as f64 / total as f64) * 100.0
+                );
                 acc
             })
     });
 
     let message = vec![
-        format!("`dn` were recoreded a total of {} times.\n", total),
+        format!("`dn` were recorded a total of {} times.\n", total),
         recent.map_or(String::new(), |recent| {
             format!(
                 "({} times since {})\n",

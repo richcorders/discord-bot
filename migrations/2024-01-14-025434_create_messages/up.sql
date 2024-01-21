@@ -1,6 +1,6 @@
 CREATE TABLE messages (
-  id BIGSERIAL PRIMARY KEY,
+  id BIGINT PRIMARY KEY,
   content TEXT NOT NULL,
   time_stamp TIMESTAMP NOT NULL,
   author_id BIGINT NOT NULL
-)
+);
