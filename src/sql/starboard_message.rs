@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 use diesel::result::Error;
 
-use super::{models, schema};
+use super::models;
+use super::schema::{self};
 use crate::sql::models::StarboardedMessage;
 
 pub fn upsert(
@@ -10,6 +11,7 @@ pub fn upsert(
     starboard_id_val: i64,
     author_id_val: i64,
     react_count_val: i32,
+    manual_val: bool,
 ) -> Result<models::StarboardedMessage, Error> {
     use schema::starboarded_messages;
     use schema::starboarded_messages::dsl::*;
@@ -19,6 +21,7 @@ pub fn upsert(
         starboard_id: starboard_id_val,
         author_id: author_id_val,
         react_count: react_count_val,
+        manual: manual_val,
     };
 
     diesel::insert_into(starboarded_messages::table)
@@ -38,18 +41,4 @@ pub fn exists(conn: &mut PgConnection, message_id_val: i64) -> Result<bool, Erro
         .first(conn)
         .optional()
         .map(|x: Option<StarboardedMessage>| x.is_some())
-}
-
-pub fn get_starboard_id_for_emoji(
-    conn: &mut PgConnection,
-    guild_id: i64,
-    emoji: &str,
-) -> Result<i64, Error> {
-    use schema::starboard_options::dsl::*;
-
-    starboard_options
-        .filter(guild_id.eq(guild_id))
-        .filter(emoji.eq(emoji))
-        .select(channel_id)
-        .first(conn)
 }

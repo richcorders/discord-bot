@@ -7,9 +7,9 @@ use std::env;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
 use parking_lot::Mutex;
-use poise::serenity_prelude::{
-    self as serenity, ActivityData, ChannelId, GatewayIntents, GuildId, ReactionType,
-};
+use poise::serenity_prelude::{self as serenity, ActivityData, GatewayIntents, GuildId};
+use sql::models::BotOptions;
+use sql::options;
 
 use crate::event_handler::event_handler;
 mod commands;
@@ -19,22 +19,9 @@ mod sql;
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
-#[derive(Default, Clone, Copy)]
-pub struct StarboardOptions {
-    channel_id: ChannelId,
-    threshold: u64,
-}
-// unsafe impl Send for StarboardOptions {}
-// unsafe impl Sync for StarboardOptions {}
-#[derive(Default, Clone)]
-pub struct BotOptions {
-    starboard_options: HashMap<GuildId, HashMap<ReactionType, StarboardOptions>>,
-}
-// unsafe impl Send for BotOptions {}
-// unsafe impl Sync for BotOptions {}
 pub struct Data {
     db_pool: Pool<ConnectionManager<PgConnection>>,
-    bot_options: Mutex<BotOptions>,
+    bot_options: Mutex<HashMap<GuildId, BotOptions>>,
 }
 
 #[tokio::main]
@@ -46,7 +33,12 @@ async fn main() {
 
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
     let db_pool = sql::get_connection_pool(database_url).expect("Failed to connect to database.");
-    sql::run_migrations(&mut db_pool.get().unwrap()).expect("Failed to run migrations.");
+    sql::run_migrations(
+        &mut db_pool
+            .get()
+            .expect("Failed to get pool connection for initial migrations."),
+    )
+    .expect("Failed to run migrations.");
 
     let options = poise::FrameworkOptions {
         commands: vec![
@@ -67,28 +59,14 @@ async fn main() {
     let framework = poise::Framework::builder()
         .setup(move |ctx, _, framework| {
             Box::pin(async move {
+                let conn = &mut db_pool.get().unwrap();
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 ctx.set_activity(Some(ActivityData::watching("dn")));
-
-                let mut dev_options = BotOptions {
-                    starboard_options: HashMap::new(),
-                };
-                dev_options.starboard_options.insert(
-                    840086859119460382.into(),
-                    vec![(
-                        ReactionType::Unicode("⭐".into()),
-                        StarboardOptions {
-                            channel_id: 1197472255295377470.into(),
-                            threshold: 2,
-                        },
-                    )]
-                    .into_iter()
-                    .collect(),
-                );
+                let bot_options = options::get(conn).unwrap();
 
                 Ok(Data {
                     db_pool,
-                    bot_options: dev_options.into(),
+                    bot_options: Mutex::new(bot_options),
                 })
             })
         })
@@ -99,5 +77,9 @@ async fn main() {
         .framework(framework)
         .await;
 
-    client.unwrap().start().await.unwrap();
+    client
+        .expect("Failed to create serenity client.")
+        .start()
+        .await
+        .expect("Failed to start serenity client.");
 }

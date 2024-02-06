@@ -8,14 +8,14 @@ use crate::sql::models::DegenLeaderboard;
 use crate::{Context, Error};
 
 /// The Richcord degen leaderboard
-#[poise::command(slash_command, subcommands("register", "show"))]
+#[poise::command(slash_command, guild_only, subcommands("register", "show"))]
 #[allow(clippy::unused_async)]
 pub async fn degen_leaderboard(_: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
 /// Show the Richcord degen leaderboard
-#[poise::command(slash_command)]
+#[poise::command(slash_command, guild_only)]
 async fn show(ctx: Context<'_>) -> Result<(), Error> {
     use crate::sql::schema::degen_leaderboard::dsl::*;
     let conn = &mut ctx.data().db_pool.clone().get().unwrap();
@@ -66,7 +66,7 @@ async fn show(ctx: Context<'_>) -> Result<(), Error> {
 }
 
 /// Register your score to the Richcord degen leaderboard
-#[poise::command(slash_command)]
+#[poise::command(slash_command, guild_only)]
 async fn register(
     ctx: Context<'_>,
     #[rename = "weighted_score"] score_value: f64,

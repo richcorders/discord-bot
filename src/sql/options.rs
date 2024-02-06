@@ -1,38 +1,39 @@
 use std::collections::HashMap;
-use std::sync::Mutex;
 
 use diesel::prelude::*;
-use poise::serenity_prelude::ReactionType;
+use poise::serenity_prelude::GuildId;
 
-use super::models::{BotOptions as BotOptionsDB, StarboardOptions as StarboardOptionsDB};
-use crate::{BotOptions, StarboardOptions};
+use super::models::BotOptions;
 
-pub fn get(conn: &mut PgConnection) -> Result<Mutex<BotOptions>, diesel::result::Error> {
-    super::schema::bot_options::table
-        .select(BotOptionsDB::as_select())
+/// get the options for all guilds
+pub fn get(conn: &mut PgConnection) -> Result<HashMap<GuildId, BotOptions>, diesel::result::Error> {
+    use super::schema::bot_options::dsl::*;
+
+    bot_options
+        .select(BotOptions::as_select())
         .load(conn)
         .map(|options| {
-            let mut starboard_options = HashMap::new();
-            for bot_option in options {
-                let mut starboard_options_for_guild = HashMap::new();
-                let starboard_options_db = super::schema::starboard_options::table
-                    .filter(super::schema::starboard_options::guild_id.eq(bot_option.guild_id))
-                    .load::<StarboardOptionsDB>(conn)
-                    .expect("Failed to load starboard options");
-                for starboard_option in starboard_options_db {
-                    starboard_options_for_guild.insert(
-                        ReactionType::Unicode(starboard_option.emoji),
-                        StarboardOptions {
-                            channel_id: (starboard_option.channel_id as u64).into(),
-                            threshold: starboard_option.threshold as u64,
-                        },
-                    );
-                }
-                starboard_options.insert(
-                    (bot_option.guild_id as u64).into(),
-                    starboard_options_for_guild,
-                );
-            }
-            Mutex::new(BotOptions { starboard_options })
+            #[allow(clippy::cast_sign_loss)]
+            let options: HashMap<GuildId, BotOptions> = options
+                .into_iter()
+                .map(|option| ((option.guild_id as u64).into(), option))
+                .collect();
+            options
         })
+}
+
+/// update the options for a guild
+pub fn upsert(
+    conn: &mut PgConnection,
+    guild_options: &BotOptions,
+) -> Result<BotOptions, diesel::result::Error> {
+    use super::schema::bot_options::dsl::*;
+
+    diesel::insert_into(bot_options)
+        .values(guild_options)
+        .on_conflict(guild_id)
+        .do_update()
+        .set(guild_options)
+        .returning(BotOptions::as_returning())
+        .get_result(conn)
 }

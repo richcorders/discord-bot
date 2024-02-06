@@ -4,6 +4,7 @@ diesel::table! {
     bot_options (guild_id) {
         guild_id -> Int8,
         prefix -> Text,
+        starboard_options -> Jsonb,
     }
 }
 
@@ -25,20 +26,12 @@ diesel::table! {
 }
 
 diesel::table! {
-    starboard_options (guild_id) {
-        guild_id -> Int8,
-        channel_id -> Int8,
-        emoji -> Text,
-        threshold -> Int4,
-    }
-}
-
-diesel::table! {
     starboarded_messages (message_id) {
         message_id -> Int8,
         starboard_id -> Int8,
         author_id -> Int8,
         react_count -> Int4,
+        manual -> Bool,
     }
 }
 
@@ -46,6 +39,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     bot_options,
     degen_leaderboard,
     messages,
-    starboard_options,
     starboarded_messages,
 );

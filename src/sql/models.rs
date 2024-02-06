@@ -1,5 +1,9 @@
+use std::collections::HashMap;
+
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
+use poise::serenity_prelude::{self as serenity, ChannelId};
+use serde::{Deserialize, Serialize};
 
 use super::schema;
 
@@ -22,22 +26,19 @@ pub struct DegenLeaderboard {
     pub time_stamp: NaiveDateTime,
 }
 
-#[derive(Queryable, Selectable, Insertable)]
+#[derive(Queryable, Selectable, Insertable, AsChangeset, Clone)]
 #[diesel(table_name = schema::bot_options)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct BotOptions {
     pub guild_id: i64,
     pub prefix: String,
+    pub starboard_options: diesel_json::Json<HashMap<serenity::ReactionType, StarboardPerEmoji>>,
 }
 
-#[derive(Queryable, Selectable, Insertable)]
-#[diesel(table_name = schema::starboard_options)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct StarboardOptions {
-    pub guild_id: i64,
-    pub channel_id: i64,
-    pub emoji: String,
-    pub threshold: i32,
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StarboardPerEmoji {
+    pub channel_id: ChannelId,
+    pub threshold: u32,
 }
 
 #[derive(Queryable, Selectable, Insertable)]
@@ -48,4 +49,5 @@ pub struct StarboardedMessage {
     pub starboard_id: i64,
     pub author_id: i64,
     pub react_count: i32,
+    pub manual: bool,
 }

@@ -1,9 +1,9 @@
 use poise::serenity_prelude::*;
 
-use crate::sql::starboard_message::{self};
-use crate::{BotOptions, Data, StarboardOptions};
+use crate::sql::starboard_message;
+use crate::Data;
 
-async fn create_starboard_message(ctx: &Context, msg: &Message, starboard_channel_id: u64) {
+async fn create_starboard_message(ctx: &Context, msg: &Message, starboard_channel_id: ChannelId) {
     let message_channel: GuildChannel = msg
         .channel(ctx)
         .await
@@ -12,7 +12,7 @@ async fn create_starboard_message(ctx: &Context, msg: &Message, starboard_channe
         .expect("Failed to get guild channel");
     let starboard_channel = ctx
         .http()
-        .get_channel(starboard_channel_id.into())
+        .get_channel(starboard_channel_id)
         .await
         .expect("Failed to get channel");
 
@@ -48,19 +48,15 @@ pub async fn handle(ctx: &Context, event: &FullEvent, data: &Data) {
 
         let bot_options = data.bot_options.lock().clone();
         // get the starboard options for the guild
-        let starboard_options_for_guild = bot_options.starboard_options.get(&guild_id).unwrap();
-        // exit early if the emoji isn't mapped to a starboard
-        if !starboard_options_for_guild.contains_key(&add_reaction.emoji) {
-            return;
-        }
+        let guild_options = bot_options
+            .get(&guild_id)
+            .expect("Failed to get guild options");
 
         // exit early if the starboard doesn't have options set
-        let starboard_options =
-            if let Some(starboard_options) = starboard_options_for_guild.get(&add_reaction.emoji) {
-                *starboard_options
-            } else {
-                return;
-            };
+        let Some(starboard_options) = guild_options.starboard_options.get(&add_reaction.emoji)
+        else {
+            return;
+        };
 
         let threshold = starboard_options.threshold;
         let starboard_channel_id = starboard_options.channel_id;
@@ -79,14 +75,15 @@ pub async fn handle(ctx: &Context, event: &FullEvent, data: &Data) {
 
         let previously_starboarded = starboard_message::exists(conn, msg.id.into()).unwrap();
 
-        if star_count >= threshold && !previously_starboarded {
-            create_starboard_message(ctx, &msg, starboard_channel_id.into()).await;
+        if star_count >= threshold.into() && !previously_starboarded {
+            create_starboard_message(ctx, &msg, starboard_channel_id).await;
             starboard_message::upsert(
                 conn,
                 msg.id.into(),
                 starboard_channel_id.into(),
                 msg.author.id.into(),
                 star_count.try_into().unwrap(),
+                false,
             )
             .unwrap();
         }

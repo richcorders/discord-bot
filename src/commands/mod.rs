@@ -1,8 +1,11 @@
 mod degen_leaderboard;
 mod dn_stats;
+mod starboard;
+
 pub use degen_leaderboard::*;
 pub use dn_stats::*;
 use poise::serenity_prelude::*;
+pub use starboard::*;
 
 use crate::{Context, Error};
 
@@ -17,7 +20,9 @@ pub async fn register(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn help(
     ctx: Context<'_>,
-    #[description = "Specific command to show help about"] command: Option<String>,
+    #[description = "Specific command to show help about"]
+    #[autocomplete = "poise::builtins::autocomplete_command"]
+    command: Option<String>,
 ) -> Result<(), Error> {
     let config = poise::builtins::HelpConfiguration {
         extra_text_at_bottom: "\

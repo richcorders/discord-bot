@@ -5,7 +5,7 @@ use crate::sql::message::get_message_stats;
 use crate::{Context, Error};
 
 /// Displays deez stats
-#[poise::command(slash_command)]
+#[poise::command(slash_command, guild_only)]
 pub async fn dn_stats(
     ctx: Context<'_>,
     #[description = "Get stats for the last n days"]
