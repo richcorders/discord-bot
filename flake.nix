@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+# SPDX-License-Identifier: CC0-1.0
+
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -44,7 +47,9 @@
             inherit system;
             overlays = [ inputs.fenix.overlays.default ];
           };
+
           formatter = pkgs.nixfmt-rfc-style;
+
           devenv.shells.default = {
             containers = pkgs.lib.mkForce { };
             dotenv.enable = true;
@@ -52,11 +57,23 @@
               enable = true;
               toolchain.rustfmt = pkgs.fenix.latest.rustfmt;
             };
-            packages = [ pkgs.diesel-cli ] ++ self'.packages.default.buildInputs ++ [ self'.formatter ];
+            packages =
+              self'.packages.default.buildInputs
+              ++ [ pkgs.diesel-cli ]
+              ++ [
+                self'.formatter
+                pkgs.reuse
+              ];
             pre-commit.hooks = {
               clippy.enable = true;
               nixfmt.enable = true;
               nixfmt.package = pkgs.nixfmt-rfc-style;
+              reuse = {
+                enable = true;
+                name = "REUSE Compliance Check";
+                entry = "${pkgs.reuse}/bin/reuse lint";
+                pass_filenames = false;
+              };
               rustfmt.enable = true;
             };
             services.postgres = {
@@ -65,9 +82,8 @@
               listen_addresses = "127.0.0.1";
             };
           };
-          packages = {
-            default = pkgs.callPackage ./nix { };
-          };
+
+          packages.default = pkgs.callPackage ./nix { };
         };
     };
 

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use poise::serenity_prelude::{Context, FullEvent, Message, ReactionType};
 
 use crate::sql::message;

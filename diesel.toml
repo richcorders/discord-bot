@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+# SPDX-License-Identifier: CC0-1.0
+
 [print_schema]
 file = "src/sql/schema.rs"
 custom_type_derives = ["diesel::query_builder::QueryId"]

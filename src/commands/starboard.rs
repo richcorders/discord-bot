@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+// SPDX-License-Identifier: AGPL-3.0-only
+
 // FIXME: remove once starboard has actual commands
 #![allow(clippy::unused_async)]
 use poise::serenity_prelude::ReactionType;
