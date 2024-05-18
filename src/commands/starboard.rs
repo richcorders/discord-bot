@@ -1,3 +1,5 @@
+// FIXME: remove once starboard has actual commands
+#![allow(clippy::unused_async)]
 use poise::serenity_prelude::ReactionType;
 
 use crate::{Context, Error};

@@ -49,8 +49,8 @@ pub fn get_message_stats(conn: &mut PgConnection, since_days: Option<u32>) -> St
             })
     });
 
-    let message = vec![
-        format!("`dn` were recorded a total of {} times.\n", total),
+    let message = [
+        format!("`dn` were recorded a total of {total} times.\n"),
         recent.map_or(String::new(), |recent| {
             format!(
                 "({} times since {})\n",

@@ -3,7 +3,8 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   cfg = config.services.discord-richbot;
   databaseConfig = {
     services.postgresql = {
@@ -19,13 +20,14 @@
     };
 
     systemd.services.discord-richbot = {
-      requires = ["postgresql.service"];
-      after = ["postgresql.service"];
+      requires = [ "postgresql.service" ];
+      after = [ "postgresql.service" ];
     };
   };
 
   inherit (lib) types;
-in {
+in
+{
   options.services.discord-richbot = {
     enable = lib.mkEnableOption "discord-richbot";
     package = lib.mkPackageOption pkgs "discord-richbot";
