@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+// SPDX-License-Identifier: AGPL-3.0-only
+
 use diesel::pg::{Pg, PgConnection};
 use diesel::r2d2::{ConnectionManager, Pool, PoolError};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};

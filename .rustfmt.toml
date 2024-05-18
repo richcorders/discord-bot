@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+# SPDX-License-Identifier: CC0-1.0
+
 # keep these in alphabetical order: https://github.com/rust-lang/rustfmt/issues/3149
 group_imports = "StdExternalCrate"
 imports_granularity = "Module"

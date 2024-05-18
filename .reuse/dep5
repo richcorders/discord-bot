@@ -1,0 +1,15 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: richcord-discord-bot
+Upstream-Contact: winston <hey@winston.sh>
+Source: https://github.com/richcorders/discord-bot
+
+# no claim to lockfiles
+Files: 
+  *.lock
+Copyright: 2024 winston <hey@winston.sh>
+License: CC0-1.0
+
+Files: 
+  src/sql/schema.rs
+Copyright: 2024 winston <hey@winston.sh>
+License: AGPL-3.0-only

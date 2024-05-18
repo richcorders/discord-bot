@@ -1,8 +1,12 @@
+# SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+# SPDX-License-Identifier: CC0-1.0
+
 [package]
 name = "richbot"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.74.0"
+license = "AGPL-3.0-only"
 
 [dependencies]
 anyhow = "1.0.79"
