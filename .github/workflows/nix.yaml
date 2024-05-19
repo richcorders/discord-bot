@@ -23,7 +23,7 @@ jobs:
 
       - name: Check
         run: |
-          nix flake check --impure
+          nix flake check ./nix/dev --impure
           nix develop ./nix/dev --impure --command \ 
             pre-commit run --all-files
 
