@@ -1,0 +1,13 @@
+// SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
+// SPDX-License-Identifier: CC0-1.0
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "schedule:weekly",
+    ":automergeMinor"
+  ],
+  "nix": {
+    "enabled": true
+  }
+}
