@@ -5,24 +5,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    pre-commit-nix = {
-      url = "github:cachix/pre-commit-hooks.nix";
-      inputs.flake-compat.follows = "flake-compat";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    devenv = {
-      url = "github:cachix/devenv/python-rewrite";
-      inputs.flake-compat.follows = "flake-compat";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.pre-commit-hooks.follows = "pre-commit-nix";
-    };
-    fenix = {
-      url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # debloat
-    flake-compat.url = "github:edolstra/flake-compat";
-    flake-compat.flake = false;
+    devenv.url = "github:cachix/devenv";
+    fenix.url = "github:nix-community/fenix";
   };
 
   outputs =
@@ -51,8 +35,6 @@
           formatter = pkgs.nixfmt-rfc-style;
 
           devenv.shells.default = {
-            containers = pkgs.lib.mkForce { };
-            dotenv.enable = true;
             languages.rust = {
               enable = true;
               toolchain.rustfmt = pkgs.fenix.latest.rustfmt;
