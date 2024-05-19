@@ -26,7 +26,10 @@ jobs:
       # TODO: add Cachix step
 
       - name: Check
-        run: nix flake check --impure
+        run: |
+          nix flake check --impure
+          nix develop --impure
+          pre-commit run --all-files
 
       - name: Build package
         run: nix build -Lv .

@@ -43,10 +43,13 @@
           devenv.shells.default = {
             containers = lib.mkForce { };
             enterShell = config.pre-commit.devShell.shellHook;
+            process.implementation = "overmind";
+
             languages.rust = {
               enable = true;
               toolchain.rustfmt = pkgs.fenix.latest.rustfmt;
             };
+
             packages =
               self'.packages.default.buildInputs
               ++ [ pkgs.diesel-cli ]
@@ -54,6 +57,7 @@
                 self'.formatter
                 pkgs.reuse
               ];
+
             services.postgres = {
               enable = true;
               initialDatabases = [ { name = "dn"; } ];
@@ -61,21 +65,25 @@
             };
           };
 
-          pre-commit.settings.hooks = {
-            clippy.enable = true;
-            nixfmt = {
-              enable = true;
-              package = pkgs.nixfmt-rfc-style;
-            };
-            reuse = {
-              enable = true;
-              name = "REUSE Compliance Check";
-              entry = "${pkgs.reuse}/bin/reuse lint";
-              pass_filenames = false;
-            };
-            rustfmt = {
-              enable = true;
-              package = pkgs.fenix.latest.rustfmt;
+          pre-commit = {
+            check.enable = false;
+            settings.hooks = {
+              clippy.enable = true;
+              commitizen.enable = true;
+              nixfmt = {
+                enable = true;
+                package = pkgs.nixfmt-rfc-style;
+              };
+              reuse = {
+                enable = true;
+                name = "reuse";
+                entry = "${pkgs.reuse}/bin/reuse lint";
+                pass_filenames = false;
+              };
+              rustfmt = {
+                enable = true;
+                packageOverrides.rustfmt = pkgs.fenix.latest.rustfmt;
+              };
             };
           };
 
