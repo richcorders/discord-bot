@@ -21,6 +21,7 @@
       ];
       perSystem =
         {
+          lib,
           pkgs,
           self',
           system,
@@ -35,6 +36,7 @@
           formatter = pkgs.nixfmt-rfc-style;
 
           devenv.shells.default = {
+            containers = lib.mkForce { };
             languages.rust = {
               enable = true;
               toolchain.rustfmt = pkgs.fenix.latest.rustfmt;
