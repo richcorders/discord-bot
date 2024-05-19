@@ -1,9 +1,16 @@
 # SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
 # SPDX-License-Identifier: CC0-1.0
 
-.devenv/
-.direnv/
 /result
 /target/
 .env
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
 .pre-commit-config.yaml
