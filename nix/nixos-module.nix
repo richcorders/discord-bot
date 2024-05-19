@@ -1,6 +1,5 @@
 # SPDX-FileCopyrightText: 2024 winston <hey@winston.sh>
 # SPDX-License-Identifier: CC0-1.0
-
 {
   config,
   lib,
@@ -54,21 +53,21 @@ in
         type = types.str;
         default = "richbot";
         description = ''
-          The database name to use for Richbot;
+          The database name to use for Richbot.
         '';
       };
       user = lib.mkOption {
         type = types.str;
         default = "richbot";
         description = ''
-          The database user to use for Richbot
+          The database user to use for Richbot.
         '';
       };
       password = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
         description = ''
-          The database password to use for Richbot
+          The database password to use for Richbot.
         '';
       };
     };

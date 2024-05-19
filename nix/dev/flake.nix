@@ -18,10 +18,10 @@
         inputs.git-hooks.flakeModule
       ];
       systems = [
-        "x86_64-linux"
-        "aarch64-linux"
         "aarch64-darwin"
+        "aarch64-linux"
         "x86_64-darwin"
+        "x86_64-linux"
       ];
       perSystem =
         {
@@ -87,17 +87,19 @@
             };
           };
 
-          packages.default = pkgs.callPackage ./nix { };
+          packages.default = pkgs.callPackage ../default.nix { };
         };
     };
 
   nixConfig = {
     extra-substituters = [
-      "https://nekowinston.cachix.org"
+      "https://devenv.cachix.org"
+      "https://pre-commit-hooks.cachix.org"
       "https://nix-community.cachix.org/"
     ];
     extra-trusted-public-keys = [
-      "nekowinston.cachix.org-1:lucpmaO+JwtoZj16HCO1p1fOv68s/RL1gumpVzRHRDs="
+      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      "pre-commit-hooks.cachix.org-1:Pkk3Panw5AW24TOv6kz3PvLhlH8puAsJTBbOPmBo7Rc="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };

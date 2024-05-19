@@ -12,11 +12,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: ["ubuntu-latest", "macos-latest"]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -28,8 +24,8 @@ jobs:
       - name: Check
         run: |
           nix flake check --impure
-          nix develop --impure --command \ 
+          nix develop ./nix/dev --impure --command \ 
             pre-commit run --all-files
 
-      - name: Build package
-        run: nix build -Lv .
+      - name: Build
+        run: nix build -Lv ./nix/dev
