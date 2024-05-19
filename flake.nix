@@ -6,13 +6,17 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     devenv.url = "github:cachix/devenv";
+    git-hooks.follows = "devenv/pre-commit-hooks";
     fenix.url = "github:nix-community/fenix";
   };
 
   outputs =
     { flake-parts, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ inputs.devenv.flakeModule ];
+      imports = [
+        inputs.devenv.flakeModule
+        inputs.git-hooks.flakeModule
+      ];
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -21,6 +25,7 @@
       ];
       perSystem =
         {
+          config,
           lib,
           pkgs,
           self',
@@ -37,6 +42,7 @@
 
           devenv.shells.default = {
             containers = lib.mkForce { };
+            enterShell = config.pre-commit.devShell.shellHook;
             languages.rust = {
               enable = true;
               toolchain.rustfmt = pkgs.fenix.latest.rustfmt;
@@ -48,22 +54,28 @@
                 self'.formatter
                 pkgs.reuse
               ];
-            pre-commit.hooks = {
-              clippy.enable = true;
-              nixfmt.enable = true;
-              nixfmt.package = pkgs.nixfmt-rfc-style;
-              reuse = {
-                enable = true;
-                name = "REUSE Compliance Check";
-                entry = "${pkgs.reuse}/bin/reuse lint";
-                pass_filenames = false;
-              };
-              rustfmt.enable = true;
-            };
             services.postgres = {
               enable = true;
               initialDatabases = [ { name = "dn"; } ];
               listen_addresses = "127.0.0.1";
+            };
+          };
+
+          pre-commit.settings.hooks = {
+            clippy.enable = true;
+            nixfmt = {
+              enable = true;
+              package = pkgs.nixfmt-rfc-style;
+            };
+            reuse = {
+              enable = true;
+              name = "REUSE Compliance Check";
+              entry = "${pkgs.reuse}/bin/reuse lint";
+              pass_filenames = false;
+            };
+            rustfmt = {
+              enable = true;
+              package = pkgs.fenix.latest.rustfmt;
             };
           };
 
